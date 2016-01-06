@@ -12,8 +12,66 @@
 	  <script src="cre.js"></script>
     <script>
 /* global cre requestAnimationFrame */
-function stringify(v) {
-  return JSON.stringify(v, null, 2);
+
+/*
+// potentially-serializable property names
+// via (on https://mozvr.github.io/webvr-spec/webvr.html):
+  JSON.stringify([].slice.call(document.querySelectorAll(
+    'a[data-link-type="attribute"]')).map((e)=>e.textContent), null, 2)
+*/
+var vrProperties = [
+  "timeStamp",
+  "hasPosition",
+  "position",
+  "linearVelocity",
+  "linearAcceleration",
+  "hasOrientation",
+  "orientation",
+  "angularVelocity",
+  "angularAcceleration",
+  "minimumFieldOfView",
+  "maximumFieldOfView",
+  "recommendedFieldOfView",
+  "eyeTranslation",
+  "currentFieldOfView",
+  "renderRect",
+  "hardwareUnitId",
+  "deviceId",
+  "deviceName",
+  "timeStamp",
+  "hasPosition",
+  "position",
+  "linearVelocity",
+  "linearAcceleration",
+  "hasOrientation",
+  "orientation",
+  "angularVelocity",
+  "angularAcceleration",
+  "minimumFieldOfView",
+  "maximumFieldOfView",
+  "recommendedFieldOfView",
+  "eyeTranslation",
+  "currentFieldOfView",
+  "renderRect",
+  "hardwareUnitId",
+  "deviceId",
+  "deviceName"
+];
+
+function propertize(v) {
+  if (typeof v == 'object' && !Array.isArray(v)) {
+    var o = {};
+    for (var i = 0; i < vrProperties.length; i++) {
+      var k = vrProperties[i];
+      if (v[k] !== undefined) {
+        o[k] = propertize(v[k]);
+      }
+    }
+    return o;
+  } else return v;
+}
+function serialize (v) {
+  return JSON.stringify(propertize(v), null, 2);
 }
 if (navigator.getVRDevices) {
   navigator.getVRDevices().then(begin);
@@ -22,7 +80,7 @@ if (navigator.getVRDevices) {
 }
 function stateUpdater(device, output) {
   return function () {
-    output.textContent = stringify(device.getState());
+    output.textContent = serialize(device.getState());
   };
 }
 function begin(devices) {
@@ -32,7 +90,7 @@ function begin(devices) {
     return bodyElements.push(cre('h'+level, text));
   }
   function addOutput(v) {
-    var output = cre('output', stringify(v));
+    var output = cre('output', serialize(v));
     bodyElements.push(output);
     return output;
   }
