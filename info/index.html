@@ -114,10 +114,10 @@ function begin(devices) {
     if (devices[i].getState) {
       addHeading(3, 'sensor');
       frameCbs.push(stateUpdater(devices[i],
-        addOutput('No state yet')));
+        addOutput(devices[i].getState())));
     }
   }
-  addHeading(2,'device count: '+devices.length);
+  addHeading(2,'device count: ' + devices.length);
   document.body.appendChild(cre(bodyElements));
   return requestAnimationFrame(updateFrameInfo);
 }
