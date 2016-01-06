@@ -10,8 +10,9 @@
 	</head>
 	<body>
 	  <script src="cre.js"></script>
+    <script src="https://stuartpb.github.io/loquate/loquate.js"></script>
     <script>
-/* global cre requestAnimationFrame */
+/* global cre Loquate requestAnimationFrame */
 
 /*
 // potentially-serializable property names
@@ -47,15 +48,24 @@ var vrProperties = [
   "deviceName"
 ].concat(['x','y','z','w']); // plus DOMPoint (defined elsewhere)
 
-function bodyLog(message) {
-  document.body.appendChild(cre('output', message));
+var hashQuery = location.hash.slice(0,2) == '#?'
+  ? Loquate(location.hash.slice(2), {multival: 'always'})
+  : {};
+var logLevel = hashQuery.log || [];
+
+function bodyLog(level, message) {
+  if (logLevel.indexOf(level) > -1) {
+    return document.body.appendChild(cre('output', message));
+  }
 }
 function propertize(v) {
   if (typeof v == 'object' && !Array.isArray(v)) {
     var o = {};
     for (var i = 0; i < vrProperties.length; i++) {
       var k = vrProperties[i];
+      bodyLog('props', 'checking '+k);
       if (v[k] !== undefined) {
+        bodyLog('props', 'found '+k);
         o[k] = propertize(v[k]);
       }
     }
