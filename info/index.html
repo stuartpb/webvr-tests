@@ -26,32 +26,39 @@ function stateUpdater(device, output) {
   };
 }
 function begin(devices) {
-  var outputEls = [];
+  var bodyElements = [];
   var frameCbs = [];
+  function addHeading(level, text) {
+    return bodyElements.push(cre('h'+level, text));
+  }
   function addOutput(v) {
     var output = cre('output', stringify(v));
-    outputEls.push(output);
+    bodyElements.push(output);
     return output;
   }
   function updateFrameInfo() {
     for (var i = 0; i < frameCbs.length; i++) {
       frameCbs[i]();
     }
-    requestAnimationFrame(updateFrameInfo);
+    return requestAnimationFrame(updateFrameInfo);
   }
   for (var i = 0; i < devices.length; i++) {
+    addHeading(2, 'device');
     addOutput(devices[i]);
+    if (devices[i].getEyeParameters) {
+      addHeading(3, 'left eye');
+      addOutput(devices[i].getEyeParameters('left'));
+      addHeading(3, 'right eye');
+      addOutput(devices[i].getEyeParameters('right'));
+    }
     if (devices[i].getState) {
+      addHeading(3, 'sensor');
       frameCbs.push(stateUpdater(devices[i],
         addOutput(devices[i].getState())));
     }
-    if (devices[i].getEyeParameters) {
-      addOutput(devices[i].getEyeParameters('left'));
-      addOutput(devices[i].getEyeParameters('right'));
-    }
   }
-  document.body.appendChild(cre(outputEls));
-  requestAnimationFrame(updateFrameInfo);
+  document.body.appendChild(cre(bodyElements));
+  return requestAnimationFrame(updateFrameInfo);
 }
     </script>
 	</body>
