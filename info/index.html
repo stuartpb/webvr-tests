@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<title>WebVR Device Info</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
+    <link rel="stylesheet" href="style.css">
+	</head>
+	<body>
+	  <script src="cre.js"></script>
+    <script>
+/* global cre requestAnimationFrame */
+function stringify(v) {
+  return JSON.stringify(v, null, 2);
+}
+if (navigator.getVRDevices) {
+  navigator.getVRDevices().then(begin);
+} else {
+  document.body.appendChild(cre('output','No navigator.getVRDevices'));
+}
+function stateUpdater(device, output) {
+  return function () {
+    output.textContent = stringify(device.getState());
+  };
+}
+function begin(devices) {
+  var outputEls = [];
+  var frameCbs = [];
+  function addOutput(v) {
+    var output = cre('output', stringify(v));
+    outputEls.push(output);
+    return output;
+  }
+  function updateFrameInfo() {
+    for (var i = 0; i < frameCbs.length; i++) {
+      frameCbs[i]();
+    }
+    requestAnimationFrame(updateFrameInfo);
+  }
+  for (var i = 0; i < devices.length; i++) {
+    addOutput(devices[i]);
+    if (devices[i].getState) {
+      frameCbs.push(stateUpdater(devices[i],
+        addOutput(devices[i].getState())));
+    }
+    if (devices[i].getEyeParameters) {
+      addOutput(devices[i].getEyeParameters('left'));
+      addOutput(devices[i].getEyeParameters('right'));
+    }
+  }
+  document.body.appendChild(cre(outputEls));
+  requestAnimationFrame(updateFrameInfo);
+}
+    </script>
+	</body>
+</html>
