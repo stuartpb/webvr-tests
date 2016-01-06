@@ -59,7 +59,7 @@ function bodyLog(level, message) {
   }
 }
 function propertize(v) {
-  if (typeof v == 'object' && !Array.isArray(v)) {
+  if (typeof v == 'object' && !Array.isArray(v) && v !== null) {
     var o = {};
     for (var i = 0; i < vrProperties.length; i++) {
       var k = vrProperties[i];
