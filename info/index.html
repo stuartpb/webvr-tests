@@ -16,8 +16,9 @@
 /*
 // potentially-serializable property names
 // via (on https://mozvr.github.io/webvr-spec/webvr.html):
-  JSON.stringify([].slice.call(document.querySelectorAll(
-    'a[data-link-type="attribute"]')).map((e)=>e.textContent), null, 2)
+  var attrs = document.querySelectorAll('a[data-link-type="attribute"]');
+  JSON.stringify([].slice.call(attrs, attrs.length/2)
+    .map((e)=>e.textContent), null, 2)
 */
 var vrProperties = [
   "timeStamp",
@@ -37,27 +38,12 @@ var vrProperties = [
   "renderRect",
   "hardwareUnitId",
   "deviceId",
-  "deviceName",
-  "timeStamp",
-  "hasPosition",
-  "position",
-  "linearVelocity",
-  "linearAcceleration",
-  "hasOrientation",
-  "orientation",
-  "angularVelocity",
-  "angularAcceleration",
-  "minimumFieldOfView",
-  "maximumFieldOfView",
-  "recommendedFieldOfView",
-  "eyeTranslation",
-  "currentFieldOfView",
-  "renderRect",
-  "hardwareUnitId",
-  "deviceId",
   "deviceName"
-];
+].concat(['x','y','z','w']);
 
+function bodyLog(message) {
+  document.body.appendChild(cre('output', message));
+}
 function propertize(v) {
   if (typeof v == 'object' && !Array.isArray(v)) {
     var o = {};
@@ -112,7 +98,7 @@ function begin(devices) {
     if (devices[i].getState) {
       addHeading(3, 'sensor');
       frameCbs.push(stateUpdater(devices[i],
-        addOutput(devices[i].getState())));
+        addOutput('No state yet')));
     }
   }
   addHeading(2,'device count: '+devices.length);
