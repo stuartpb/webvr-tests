@@ -115,6 +115,7 @@ function begin(devices) {
         addOutput(devices[i].getState())));
     }
   }
+  addHeading(2,'device count: '+devices.length);
   document.body.appendChild(cre(bodyElements));
   return requestAnimationFrame(updateFrameInfo);
 }
